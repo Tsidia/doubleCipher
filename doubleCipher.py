@@ -1,10 +1,7 @@
 import socket
 import threading
-import hashlib
-import os
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
-from Crypto.Protocol.KDF import HKDF
 from Crypto.Random import get_random_bytes
 
 # Function to generate RSA keys
@@ -34,6 +31,7 @@ class Server:
         self.server_socket.listen(1)
         print(f'Server listening on {host}:{port}')
         self.private_key, self.public_key = generate_rsa_keys()
+        self.aes_key = None
 
     def handle_client(self, client_socket):
         # Exchange public keys
@@ -75,7 +73,7 @@ class Server:
 
     def send_messages(self, client_socket):
         while True:
-            message = input("")
+            message = input()
             nonce, ciphertext, tag = encrypt_message(self.aes_key, message)
             client_socket.send(nonce)
             client_socket.send(ciphertext)
@@ -88,6 +86,7 @@ class Client:
         self.client_socket.connect((host, port))
         print(f'Connected to server {host}:{port}')
         self.private_key, self.public_key = generate_rsa_keys()
+        self.aes_key = None
 
     def receive_messages(self):
         # Exchange public keys
@@ -118,7 +117,7 @@ class Client:
     def start(self):
         threading.Thread(target=self.receive_messages).start()
         while True:
-            message = input("")
+            message = input()
             nonce, ciphertext, tag = encrypt_message(self.aes_key, message)
             self.client_socket.send(nonce)
             self.client_socket.send(ciphertext)
