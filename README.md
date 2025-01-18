@@ -1,2 +1,2 @@
 # doubleCipher
- Encrypted peer-to-peer communicator
+ Fully encrypted peer-to-peer communicator
